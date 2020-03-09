@@ -11,3 +11,4 @@ puppet_action_hec_token =
 puppet_bolt_server = 
 puppet_db_url = 
 timeout = 
+pe_console = 
