@@ -83,9 +83,12 @@ def run_report_generation(alert, transaction_uuids, helper):
 
   # we don't use timeouts in these queries but we're using it for token lifetime generation
   if alert['global']['timeout'] is not None and alert['global']['timeout'] is not '':
-    timeout = alert['global']['timeout']
+    raw_timeout = alert['global']['timeout']
   else:
-    timeout = 30
+    raw_timeout = 360
+
+  # filter out non integer characters
+  timeout = int(''.join(filter(str.isdigit, raw_timeout)))
   
   # we're gonna set our token lifetime to be our timeout * number of events plus 60 seconds
   lifetime = (int(timeout) * len(transaction_uuids)) + 60

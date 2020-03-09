@@ -16,6 +16,7 @@ param.task_name = <string> Task. It's a required parameter.
 param.task_parameters = <string> Task Parameters.
 param.puppet_environment = <string> Puppet Environment. It's a required parameter. It's default value is production.
 param.puppet_enterprise_console = <string> Puppet Enterprise Console.
+param.bolt_user = <string> Bolt User.
 param.puppet_bolt_server = <string> Orch. Services URL.
 param.puppet_db_url = <string> PuppetDB URL.
 param.timeout = <string> Timeout.
