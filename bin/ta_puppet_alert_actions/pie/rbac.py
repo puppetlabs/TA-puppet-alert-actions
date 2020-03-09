@@ -13,7 +13,7 @@ except ImportError:
 #https://puppet.angrydome.org:4433/rbac-api/v1/auth/token
 def genauthtoken(username, password, label, url, timeout=360):
 
-  lifetime = "{}s".format(timeout*2)
+  lifetime = "{}s".format(timeout)
 
   req = {
     'login': username,

@@ -1,5 +1,6 @@
 
 # encoding = utf-8
+from puppet_report_generation import run_report_generation
 
 # given a setting, check to see if the alert is configured with default override
 def override(setting_name, helper):
@@ -114,7 +115,7 @@ def process_event(helper, *args, **kwargs):
     helper.log_info("Log_level: {}".format(helper.log_level))
     
     # we use the override function to ensure we always use the alert value over the global if one exists
-    helper.log_info("Credential lookup.")
+    helper.log_info("Credential lookup")
     user_name = override('puppet_default_user', helper)
 
     # get_user_credential gives us the user_name, unfortunately we can't search by ID even though inputs can
@@ -124,6 +125,8 @@ def process_event(helper, *args, **kwargs):
 
     helper.log_debug("username={}".format(puppet_read_user))
     
+    # load the rest of the settings
+    helper.log_info("Retrieving settings")
     # Get PE Console, this doens't set pe_console value, that is from the alert itself
     puppet_enterprise_console = override("puppet_enterprise_console", helper)
     helper.log_debug("puppet_enterprise_console={}".format(puppet_enterprise_console))
@@ -148,7 +151,8 @@ def process_event(helper, *args, **kwargs):
     timeout = override("timeout", helper)
     helper.log_debug("timeout={}".format(timeout))
 
-
+    # create our alert object to build the actual report
+    helper.log_info("Assembling alert data")
     alert = {}
     alert['global'] = {}
     alert['param'] = {}
@@ -158,12 +162,31 @@ def process_event(helper, *args, **kwargs):
     alert['global']['puppet_read_user_pass'] = puppet_read_user_pass
     alert['global']['splunk_hec_url'] = splunk_hec_url
     alert['global']['splunk_hec_token'] = splunk_hec_token
+    alert['global']['timeout'] = timeout
     
     # we're using the notnone function to ensure we always have a value, even if it's duplicate
     # we call it with notnone(default_value, possible_none, helper) - default_value is returned if possible_none is None
     alert['global']['puppet_action_hec_token'] = notnone(splunk_hec_token, puppet_action_hec_token, helper)
     alert['global']['puppet_db_url'] = notnone(puppet_enterprise_console, puppet_db_url, helper)
 
+
+    helper.log_debug("Getting event data")
+    # we're going to strip out the three things we need from every event
+    # we're also not going to assume we are sent one event
+    events = helper.get_events()
+
+    # these are the reports we need to retrieve
+    transaction_uuids = []
+
+    # we just need these three fields from all events
+    fields = {'transaction_uuid','host','pe_console'}
+    for event in events:
+        temp_dict = {}
+        for key in fields:
+            temp_dict[key] = events[event][key]
+        transaction_uuids.append(temp_dict.copy())
+
+    run_report_generation(alert, transaction_uuids, helper)
 
     helper.log_info("Alert action puppet_generate_detailed_report completed.")
 
