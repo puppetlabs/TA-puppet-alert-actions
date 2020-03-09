@@ -66,6 +66,8 @@ def process_event(helper, *args, **kwargs):
     helper.log_info("puppet_db_url={}".format(puppet_db_url))
     timeout = helper.get_global_setting("timeout")
     helper.log_info("timeout={}".format(timeout))
+    pe_console = helper.get_global_setting("pe_console")
+    helper.log_info("pe_console={}".format(pe_console))
 
     # The following example gets the alert action parameters and prints them to the log
     puppet_enterprise_console = helper.get_param("puppet_enterprise_console")
@@ -88,6 +90,9 @@ def process_event(helper, *args, **kwargs):
 
     timeout = helper.get_param("timeout")
     helper.log_info("timeout={}".format(timeout))
+
+    pe_console = helper.get_param("pe_console")
+    helper.log_info("pe_console={}".format(pe_console))
 
 
     # The following example adds two sample events ("hello", "world")
