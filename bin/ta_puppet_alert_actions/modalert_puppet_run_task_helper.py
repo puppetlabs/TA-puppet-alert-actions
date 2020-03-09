@@ -175,6 +175,10 @@ def process_event(helper, *args, **kwargs):
     puppet_bolt_server = override("puppet_bolt_server", helper)
     helper.log_debug("puppet_bolt_server={}".format(puppet_bolt_server))
 
+    # we need a pe_console server hostname to indicate which pe install this is for
+    pe_console = override("pe_console", helper)
+    helper.log_debug("pe_console={}".format(pe_console))
+
     # things that inform our actual bolt task
 
     bolt_target = helper.get_param("bolt_target")

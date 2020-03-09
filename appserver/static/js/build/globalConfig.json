@@ -277,7 +277,7 @@
                             "field": "pe_console",
                             "label": "PE Installation",
                             "type": "text",
-                            "help": "URL to PE Installation console (pe_console hostname used in splunk_hec module)",
+                            "help": "Hostname of PE Installation - puppet.company.lan or pe_console value from splunk_hec module",
                             "required": false,
                             "defaultValue": "",
                             "validators": [
