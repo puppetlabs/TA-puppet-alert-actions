@@ -221,6 +221,7 @@ def process_event(helper, *args, **kwargs):
     alert['global']['puppet_bolt_server'] = notnone(puppet_enterprise_console, puppet_bolt_server, helper)
     alert['global']['puppet_action_hec_token'] = notnone(splunk_hec_token, puppet_action_hec_token, helper)
     alert['global']['timeout'] = timeout
+    alert['global']['pe_console'] = pe_console
 
     # Load the alert specific settings that are really the task we're running
     alert['param']['bolt_target'] = bolt_target

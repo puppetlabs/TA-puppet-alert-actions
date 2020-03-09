@@ -41,7 +41,11 @@ def run_bolt_task(alert, helper):
   task_name = alert['param']['task_name']
   task_parameters = alert['param']['task_parameters']
 
-  pe_console = endpoints['console_hostname']
+  # parse if we were given a hostname already
+  if alert['global']['pe_console'] is not None and alert['global']['pe_console'] is not '':
+    pe_console = alert['global']['pe_console']
+  else:
+    pe_console = endpoints['console_hostname']
 
   message = {
     'message': 'Running task {} on {} '.format(task_name,bolt_target),
@@ -49,6 +53,7 @@ def run_bolt_task(alert, helper):
     'action_name': task_name,
     'action_parameters': task_parameters,
     'action_state': 'starting',
+    'pe_console': pe_console,
   }
 
   helper.log_debug(message)
