@@ -128,7 +128,7 @@ def process_event(helper, *args, **kwargs):
     
     # load the rest of the settings
     helper.log_info("Retrieving settings")
-    # Get PE Console, this doens't set pe_console value, that is from the alert itself
+    # Get PE Console, this doesn't set pe_console value, that is from the alert itself
     puppet_enterprise_console = override("puppet_enterprise_console", helper)
     helper.log_debug("puppet_enterprise_console={}".format(puppet_enterprise_console))
     

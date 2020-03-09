@@ -24,7 +24,6 @@ import json
 
 
 def run_bolt_task(alert, helper):
-  helper.set_log_level(helper.log_level)
   # load our URLs, we generate possible ones assuming the console hostname is valid
   # however if a user provides their own pdb or bolt url it goes here
   # this also allows for us to add an int_proxy feature in the future
@@ -64,14 +63,14 @@ def run_bolt_task(alert, helper):
   bolt_user_pass = alert['global']['bolt_user_pass']
 
   if alert['global']['timeout'] is not None and alert['global']['timeout'] is not '':
-    raw_timeout = alert['global']['timeout']
+    task_timeout = alert['global']['timeout']
   else:
-    raw_timeout = 360
+    task_timeout = 360
 
-  # filter out non integer characters
-  task_timeout = int(''.join(filter(str.isdigit, raw_timeout)))
-
-  token_lifetime = int(task_timeout) * 2
+  try:
+    token_lifetime = int(task_timeout) * 2
+  except Exception as e:
+    helper.log_error("Timeout must be an integer, '{}' was provided instead".format(task_timeout))
 
   auth_token = pie.rbac.genauthtoken(bolt_user,bolt_user_pass,'TA-puppet-alert-actions',rbac_url, timeout=token_lifetime)
 
@@ -81,7 +80,7 @@ def run_bolt_task(alert, helper):
   try:
     job = pie.bolt.reqtask(bolt_target,task_name,auth_token,puppet_environment,bolt_url,parameters=task_parameters)
     jobid = job['name']
-    helper.debug('Bolt Talks successfully requested with ID of {}'.format(jobid))
+    helper.log_debug('Bolt Talks successfully requested with ID of {}'.format(jobid))
   except Exception as e:
     helper.log_error('Unable to request bolt task before of {}'.format(e))
 
@@ -97,7 +96,7 @@ def run_bolt_task(alert, helper):
     rmessage['joburl'] = 'https://{}/#/run/jobs/{}'.format(pe_console,jobid)
     rmessage['pe_console'] = pe_console
     rmessage['result'] = result['result']
-    rmessage['transaction_uuid'] = result['transaction_uuid'] or message['transaction_uuid']
+    #rmessage['transaction_uuid'] = result['transaction_uuid'] or message['transaction_uuid']
     rmessage['start_timestamp'] = result['start_timestamp']
     rmessage['duration'] = result['duration']
     rmessage['finish_timestamp'] = result['finish_timestamp']

@@ -83,15 +83,15 @@ def run_report_generation(alert, transaction_uuids, helper):
 
   # we don't use timeouts in these queries but we're using it for token lifetime generation
   if alert['global']['timeout'] is not None and alert['global']['timeout'] is not '':
-    raw_timeout = alert['global']['timeout']
+    timeout = alert['global']['timeout']
   else:
-    raw_timeout = 360
+    timeout = 360
 
-  # filter out non integer characters
-  timeout = int(''.join(filter(str.isdigit, raw_timeout)))
-  
   # we're gonna set our token lifetime to be our timeout * number of events plus 60 seconds
-  lifetime = (int(timeout) * len(transaction_uuids)) + 60
+  try:
+    lifetime = (int(timeout) * len(transaction_uuids)) + 60
+  except Exception as e:
+    helper.log_error("Timeout must be an integer, '{}' was provided instead".format(timeout))
 
   #message = {
   #  'message': 'Looking up detailed report for run: {}'.format(transaction_uuid),
@@ -105,7 +105,7 @@ def run_report_generation(alert, transaction_uuids, helper):
 
   helper.log_debug("Attempting to get token for {}".format(pdbuser))
 
-  auth_token = pie.rbac.genauthtoken(pdbuser,pdbpass,'splunk report viewer',rbac_url, lifetime)
+  auth_token = pie.rbac.genauthtoken(pdbuser,pdbpass,'TA-puppet-alert-actions',rbac_url, lifetime)
 
   helper.log_info("Attempting to generate and submit {} detailed reports".format(len(transaction_uuids)))
   for uuid in transaction_uuids:
