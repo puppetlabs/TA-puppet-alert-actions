@@ -1,5 +1,6 @@
 
 # encoding = utf-8
+import json
 from puppet_report_generation import run_report_generation
 
 # given a setting, check to see if the alert is configured with default override
@@ -178,14 +179,18 @@ def process_event(helper, *args, **kwargs):
     # these are the reports we need to retrieve
     transaction_uuids = []
 
-    # we just need these three fields from all events
-    fields = {'transaction_uuid','host','pe_console'}
-    for event in events:
-        temp_dict = {}
-        for key in fields:
-            temp_dict[key] = events[event][key]
+    for event_raw in events:
+        event = json.loads(event_raw["_raw"])
+        helper.log_debug("Event Data Raw: {}".format(event))
+        # copy the needed data to a new dictionary
+        temp_dict = {
+            'pe_console': event['pe_console'],
+            'transaction_uuid': event['transaction_uuid'],
+            'host': event['certname'],
+        }
         transaction_uuids.append(temp_dict.copy())
 
+    helper.log_debug("Events: {}".format(transaction_uuids))
     run_report_generation(alert, transaction_uuids, helper)
 
     helper.log_info("Alert action puppet_generate_detailed_report completed.")

@@ -115,7 +115,7 @@ def run_report_generation(alert, transaction_uuids, helper):
     try:
       detailed_report = pie.pdb.query(pql, pdb_url, auth_token)[0]
     except Exception as e:
-      helper.log_critical("Puppet DB query {} returned no results: error = {}".format(pql, e))
+      helper.log_error("Puppet DB query {} returned no results: error = {}".format(pql, e))
     
     repo_hash = detailed_report['hash']
     detailed_report['url'] = 'https://{}/#/inspect/report/{}/events'.format(uuid['pe_console'],repo_hash)
