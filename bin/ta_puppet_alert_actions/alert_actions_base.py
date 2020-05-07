@@ -66,16 +66,6 @@ class ModularAlertBase(ModularAction):
         }
         '''
         return self.setup_util.get_credential_by_username(username)
-    
-    def get_user_credential(self, username):
-        '''
-        if the username exists, return
-        {
-            "username": username,
-            "password": credential
-        }
-        '''
-        return self.setup_util.get_credential_by_username(username)
 
     @property
     def log_level(self):
