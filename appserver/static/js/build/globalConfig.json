@@ -2,7 +2,7 @@
     "meta": {
         "name": "TA-puppet-alert-actions",
         "displayName": "Puppet Alert Actions",
-        "version": "0.5.0",
+        "version": "0.6.0",
         "apiVersion": "3.0.0",
         "restRoot": "TA_puppet_alert_actions"
     },
