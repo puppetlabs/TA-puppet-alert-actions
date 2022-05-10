@@ -77,7 +77,11 @@ def run_bolt_task(alert, helper):
   except Exception as e:
     helper.log_error("Timeout must be an integer, '{}' was provided instead".format(task_timeout))
 
-  auth_token = pie.rbac.genauthtoken(bolt_user,bolt_user_pass,'TA-puppet-alert-actions',rbac_url, timeout=token_lifetime)
+ # Check if the user is configured with an RBAC token or Password:
+  if alert['global']['pe_token']:
+    auth_token = bolt_user_pass
+  else:
+    auth_token = pie.rbac.genauthtoken(bolt_user,bolt_user_pass,'TA-puppet-alert-actions',rbac_url, timeout=token_lifetime)
 
   # note: parameters is expected as a text string, not json, so in sample alert json must be represented as:
   # "task_parameters": "{ \"name\": \"ntpd\", \"action\": \"status\"}"

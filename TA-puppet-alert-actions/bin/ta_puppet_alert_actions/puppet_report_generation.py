@@ -103,9 +103,12 @@ def run_report_generation(alert, transaction_uuids, helper):
 
   # all our data / settin parsing is done, lets do work
 
-  helper.log_debug("Attempting to get token for {}".format(pdbuser))
-
-  auth_token = pie.rbac.genauthtoken(pdbuser,pdbpass,'TA-puppet-alert-actions',rbac_url, lifetime)
+  # Check if the user is configured with an RBAC token or Password:
+  if alert['global']['pe_token']:
+    auth_token = pdbpass
+  else:
+    helper.log_debug("Attempting to get token for {}".format(pdbuser))
+    auth_token = pie.rbac.genauthtoken(pdbuser,pdbpass,'TA-puppet-alert-actions',rbac_url, lifetime)
 
   helper.log_info("Attempting to generate and submit {} detailed reports".format(len(transaction_uuids)))
   for uuid in transaction_uuids:

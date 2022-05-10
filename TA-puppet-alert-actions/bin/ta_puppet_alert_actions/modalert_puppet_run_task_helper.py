@@ -147,6 +147,10 @@ def process_event(helper, *args, **kwargs):
     puppet_bolt_user = puppet_bolt_account["username"]
     puppet_bolt_user_pass = puppet_bolt_account["password"]
 
+    # Check if users are utilizing RBAC tokens instead of Passwords.
+    # This setting is passed in as a string; so we are converting it to boolean here:
+    rbac_token = bool(int(puppet_bolt_account["pe_token"]))
+
     helper.log_debug("username={}".format(puppet_bolt_user))
 
     # load the rest of the settings
@@ -222,6 +226,7 @@ def process_event(helper, *args, **kwargs):
     alert['global']['puppet_action_hec_token'] = notnone(splunk_hec_token, puppet_action_hec_token, helper)
     alert['global']['timeout'] = timeout
     alert['global']['pe_console'] = pe_console
+    alert['global']['pe_token'] = rbac_token
 
     # Load the alert specific settings that are really the task we're running
     alert['param']['bolt_target'] = bolt_target

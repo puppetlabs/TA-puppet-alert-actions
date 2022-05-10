@@ -129,6 +129,10 @@ def process_event(helper, *args, **kwargs):
     puppet_read_user = puppet_read_account["username"]
     puppet_read_user_pass = puppet_read_account["password"]
 
+    # Check if users are utilizing RBAC tokens instead of Passwords.
+    # This setting is passed in as a string; so we are converting it to boolean here:
+    rbac_token = bool(int(puppet_read_account["pe_token"]))
+
     helper.log_debug("username={}".format(puppet_read_user))
     
     # load the rest of the settings
@@ -169,6 +173,7 @@ def process_event(helper, *args, **kwargs):
     alert['global']['splunk_hec_url'] = splunk_hec_url
     alert['global']['splunk_hec_token'] = splunk_hec_token
     alert['global']['timeout'] = timeout
+    alert['global']['pe_token'] = rbac_token
     
     # we're using the notnone function to ensure we always have a value, even if it's duplicate
     # we call it with notnone(default_value, possible_none, helper) - default_value is returned if possible_none is None
