@@ -33,6 +33,13 @@ fields = [
             min_len=1, 
             max_len=8192, 
         )
+    ),
+    field.RestField(
+        'pe_token',
+        required=False,
+        encrypted=False,
+        default=0,
+        validator=None
     )
 ]
 model = RestModel(fields, name=None)
