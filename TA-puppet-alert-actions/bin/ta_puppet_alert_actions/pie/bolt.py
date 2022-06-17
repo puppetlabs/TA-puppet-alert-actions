@@ -25,6 +25,19 @@ def post(endpoint, req, headers):
 
   return json.loads(r.text)['job']
 
+def post_plan(endpoint, req, headers):
+
+  try:
+    r = requests.post(endpoint, json=req, headers=headers, verify=False)
+  except:
+    print('Unexpected error:', sys.exc_info()[0])
+    raise
+
+  if r.status_code != 202:
+    raise ValueError('Unable to submit plan run', r.status_code, r.text)
+
+  return json.loads(r.text)['name']
+
 def reqtask(node, task, token, environment, url, parameters=None):
   headers = {'X-Authentication': token}
   params = {}
@@ -55,6 +68,19 @@ def reqdeploy(node, noop, token, environment, url):
 
   return post('{}/command/deploy'.format(url), req, headers)
 
+def reqplan(plan, token, environment, url, parameters=None):
+  headers = {'X-Authentication': token}
+  params = {}
+  if parameters:
+    params = json.loads(parameters)
+  
+  req = {
+    'environment' : environment,
+    'plan_name' : plan,
+    'params' : params,
+  }
+
+  return post_plan('{}/command/plan_run'.format(url), req, headers)
 
 
 # Get job state
@@ -85,6 +111,26 @@ def getjobresult(job, token, url, wait=10, timeout=360):
     if getjobstate(joburl, token) in completed:
       result = getjobreport(job, token, url)
       return result
+
+    time.sleep(wait)
+    runtime += wait
+
+  # we should only get here because of timeout
+  raise ValueError('Timeout execeeded waiting for: {} timeout: {} seconds'.format(joburl, timeout))
+
+# Get results of a Puppet plan
+# Given a job id, loop over getjobstate() until complete
+# or timeout is exceeded
+def getplanresult(job, token, url, wait=10, timeout=900):
+  joburl = '{}/plan_jobs/{}'.format(url,job)
+  headers = {'X-Authentication': token}
+  plan_timeout = int(timeout)
+  runtime = 0
+  completed = ['stopped', 'success', 'failure']
+  while runtime < plan_timeout:
+    if getjobstate(joburl, token) in completed:
+      r = requests.get(joburl, headers=headers, verify=False)
+      return json.loads(r.text)
 
     time.sleep(wait)
     runtime += wait
