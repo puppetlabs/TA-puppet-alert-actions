@@ -1,3 +1,6 @@
+import configparser
+import sys
+
 try:
   from urllib.parse import urlparse
 except ImportError:
@@ -20,3 +23,20 @@ def getendpoints (uri, useproxy=False):
   endpoints['console_hostname'] = hostname
 
   return endpoints
+
+# Given a path to a config_file:
+# Return a list of usernames from the config file.
+def list_accounts(config_file):
+  config = configparser.ConfigParser()
+  config.read(config_file)
+  userlist = []
+
+  for stanza in config:
+    if config.has_option(stanza,"username"):
+      setting = config[stanza]['username']
+      userlist.append(setting)
+
+  if userlist == []:
+    sys.stderr.write("TA-puppet-alert-actions: Unable to find any accounts when parsing {}".format(config_file))
+  else:
+    return userlist
